@@ -9,18 +9,47 @@ from tkcalendar import DateEntry
 import datetime as dt
 
 class StokKontrol(tk.Tk):
+    """Özet : Malzeme Stok Kontrol amacı ile yapılmış class. 
+    Bu class : Kendi içinde ayrıca dosya manager larını da 
+    instantiate ederek form yapısı ile birlikte kullanım 
+    imkanı sağlıyor.
+
+    Args:
+        Constructor herhangi bir parametre almıyor. 
+    """
     def __init__(self):
+        """ Constructor:
+            - Pencerenin geometrisini, başlığını belirliyor
+            - Class içinde, form üzerinde bulunması gereken
+            widget lara ilişkin tasarlanmış fonksiyonları da
+            çağırarak widgetlerin oluşturulmasını sağlıyor.
+            - Ayrıca Dosya Yöneticilerini ayağa kaldırıyor.
+        """
         super().__init__()
         self.title("Stok Kontrol Formu")
         self.geometry("700x400")
+
+        # Widgetları form üzerinde oluşturulması
         self.create_widgets()
+
+        #Dosya yöneticileri
         self.csvmanager = CSVFileManager()
         self.txtmanager = TextFileManager()
         self.jsonmanager = JSONFileManager()
 
-    def degerOku(self):
-        file_name = asksaveasfilename()
 
+    def degerOku(self):
+        #Dosya seçme penceresi ile kaydedilecek olan dosyanın yerinin belirlenmesi
+        file_name = asksaveasfilename(title="Please Select a File", 
+                                      initialdir="./",
+                                      defaultextension="csv",
+                                      filetypes=[("Text Files","*.txt"),
+                                                 ("json Files", "*.json"),
+                                                 ("CSV Files","*.csv")
+                                                 ]
+                                      )
+        # Form üzerindeki widgetlarda girili değerlerin alınması,
+        # liste değişkeni üzerinde saklanması : 
         data=[self.grMalzemeStokKodu.get(),
             self.grMalzemeAdi.get(),
             self.grMiktar.get(),
@@ -31,9 +60,14 @@ class StokKontrol(tk.Tk):
             self.grMalzemeSonKullanmaTarihi.get()
         ]
         print(data)
+        #Dosya yöneticisini kullanarak, liste değişkeninin 
+        #dosya ya yazdırılması
         self.csvmanager.write_to_file(file_name,data=data)
 
     def formTemizle(self):
+        # Form içinde yer alan değiştirilebilir widgetların 
+        # değerlerinin silinmesi, Takvim widget larının da 
+        # içinde bulunulan güne değiştirilmesi
         self.grMalzemeStokKodu.delete(0,tk.END)
         self.grMalzemeAdi.delete(0,tk.END)
         self.grMiktar.delete(0,tk.END)
@@ -44,6 +78,9 @@ class StokKontrol(tk.Tk):
         self.grMalzemeSonKullanmaTarihi.set_date(dt.datetime.today())
 
     def updateBirimCombo(self, event=None):
+        # Girilen malzeme adına göre Birim değerinin otomatik 
+        # olarak atanması işlemi
+
         val = self.grMalzemeAdi.get()
         if val == "Polyester" or val=="PBA":
             self.grBirim.set("kg")
@@ -55,6 +92,8 @@ class StokKontrol(tk.Tk):
             self.grBirim.set("adet")
 
     def dateChange(self, event=None):
+        # Melzeme Giriş ve Çıkış Tarihleri arasındaki değerler arasındaki
+        # farkı hesaplayan fonksiyon. Kullanım bizim fantezilerimize açık...
         date1 = self.grGiristarihi.get_date()
         date2 = self.grMalzemeSonKullanmaTarihi.get_date()
         print("Giris Tarihi :", date1,"-//- Son Kullanma Tarihi :", date2)
@@ -63,6 +102,7 @@ class StokKontrol(tk.Tk):
     #--------------------------------------
     #Create Tabs on Main Window
     def create_widgets(self):
+        # Tablar için gerekli alt yapının hazırlanması
         notebook = ttk.Notebook(self)
         self.tab1=ttk.Frame(notebook)
         self.tab2= ttk.Frame(notebook)
@@ -71,6 +111,8 @@ class StokKontrol(tk.Tk):
         notebook.add(self.tab2,text="Stok Çıkış")
         notebook.pack(expand=True, fill="both")
 
+        # tab1 ve 2 üzerinde yer alacak widget ları 
+        # çizdiren fonksiyonlar.
         self.create_tab1widgets()
         self.create_tab2widgets()
     #--------------------------------------
@@ -182,13 +224,3 @@ class StokKontrol(tk.Tk):
 
 uygulama = StokKontrol()
 uygulama.mainloop()
-
-"""
-Early testing
-Defect clustering
-Testing is context dependent
-Testing shows presence of defects
-Absence of error fallacy
-Exhaustive testing is impossible
-Pesticide paradox
-"""

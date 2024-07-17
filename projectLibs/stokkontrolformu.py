@@ -141,7 +141,14 @@ class StokKontrolFormu(tk.Tk):
         self.grCiktiLotNumarasi.grid(row=2, column=1, padx=5, pady=5, sticky="we")
 
     def degerOku(self):
-        file_name = asksaveasfilename()
+        file_name = asksaveasfilename(title="Please Select a File", 
+                                      initialdir="./",
+                                      defaultextension="csv",
+                                      filetypes=[("Text Files","*.txt"),
+                                                 ("json Files", "*.json"),
+                                                 ("CSV Files","*.csv")
+                                                 ]
+                                      )
         self.data = [
             self.grMalzemeStokKodu.get(),
             self.grMalzemeAdi.get(),
